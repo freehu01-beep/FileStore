@@ -6,7 +6,7 @@ from logging.handlers import RotatingFileHandler
 LOG_FILE_NAME = "bot.log"
 PORT = os.getenv("PORT", "5010")
 
-OWNER_ID = int(os.getenv("OWNER_ID", "6497757690"))
+OWNER_ID = int(os.getenv("OWNER_ID", "7372953562"))
 
 MSG_EFFECT = int(os.getenv("MSG_EFFECT", "5046509860389126442"))
 
@@ -35,7 +35,7 @@ DB_CHANNEL = int(os.getenv("DB_CHANNEL"))
 AUTO_DEL = int(os.getenv("AUTO_DEL", "300"))
 
 # Admin IDs (space separated in ENV)
-ADMINS = list(map(int, os.getenv("ADMINS", "6497757690").split()))
+ADMINS = list(map(int, os.getenv("ADMINS", "6734851240").split()))
 
 # Bot Settings
 DISABLE_BTN = os.getenv("DISABLE_BTN", "True") == "True"
