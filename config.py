@@ -1,102 +1,84 @@
-# This file is part of < https://github.com/Codeflix-Bots/FileStore > project,
-# and is released under the MIT License.
-# Please see < https://github.com/Codeflix-Bots/FileStore/blob/master/LICENSE >
-#
-# All rights reserved.
-#
-
 import os
-from os import environ, getenv
 import logging
 from logging.handlers import RotatingFileHandler
 
+# ---------------- BOT CONFIG ----------------
+LOG_FILE_NAME = "bot.log"
+PORT = os.getenv("PORT", "5010")
 
-# --------------------------------------------
-# Bot token @Botfather
-TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
-APP_ID = int(os.environ.get("APP_ID"))  # API ID from my.telegram.org
-API_HASH = os.environ.get("API_HASH")   # API HASH from my.telegram.org
-# --------------------------------------------
+OWNER_ID = int(os.getenv("OWNER_ID", "6497757690"))
 
-CHANNEL_ID = int(os.environ.get("CHANNEL_ID"))  # DB channel ID
-OWNER = os.environ.get("OWNER", "CrazyXAbhi")   # Owner username
-OWNER_ID = int(os.environ.get("OWNER_ID"))      # Owner Telegram ID
-# --------------------------------------------
-PORT = os.environ.get("PORT", "8080")
-# --------------------------------------------
-DB_URI = os.environ.get("DATABASE_URL")
-DB_NAME = os.environ.get("DATABASE_NAME", "Store")
-# --------------------------------------------
-FSUB_LINK_EXPIRY = int(os.getenv("FSUB_LINK_EXPIRY", "0"))  # 0 = no expiry
-BAN_SUPPORT = os.environ.get("BAN_SUPPORT", "https://t.me/CrazyXAbhi_official")
-TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "200"))
-# --------------------------------------------
-START_PIC = os.environ.get(
-    "START_PIC",
-    "https://telegra.ph/file/ec17880d61180d3312d6a.jpg"
-)
-FORCE_PIC = os.environ.get(
-    "FORCE_PIC",
-    "https://telegra.ph/file/e292b12890b8b4b9dcbd1.jpg"
-)
-# --------------------------------------------
+MSG_EFFECT = int(os.getenv("MSG_EFFECT", "5046509860389126442"))
 
-# --------------------------------------------
-HELP_TXT = "<b><blockquote>ᴛʜɪs ɪs ᴀɴ ғɪʟᴇ ᴛᴏ ʟɪɴᴋ ʙᴏᴛ by <a href=https://t.me/CrazyXAbhi_official>CrazyXAbhi</a>\n\n❏ ʙᴏᴛ ᴄᴏᴍᴍᴀɴᴅs\n├/start : sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ\n├/about : ᴏᴜʀ Iɴғᴏʀᴍᴀᴛɪᴏɴ\n└/help : ʜᴇʟᴘ ʀᴇʟᴀᴛᴇᴅ ʙᴏᴛ\n\n sɪᴍᴘʟʏ ᴄʟɪᴄᴋ ᴏɴ ʟɪɴᴋ ᴀɴᴅ sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ</blockquote></b>"
+SHORT_URL = os.getenv("SHORT_URL", "linkshortify.com")
+SHORT_API = os.getenv("SHORT_API", "")
+SHORT_TUT = os.getenv("SHORT_TUT", "https://t.me/CrazyXAbhi_official")
 
-ABOUT_TXT = "<b><blockquote>◈ ᴄʀᴇᴀᴛᴏʀ: <a href=https://t.me/CrazyXAbhi_official>CrazyXAbhi</a>\n◈ ᴏғғɪᴄɪᴀʟ ᴄʜᴀɴɴᴇʟ : <a href=https://t.me/CrazyXAbhi_official>CrazyXAbhi Official</a>\n◈ ᴅᴇᴠᴇʟᴏᴘᴇʀ : <a href=https://t.me/CrazyXAbhi_official>CrazyXAbhi</a></blockquote></b>"
-# --------------------------------------------
+# ---------------- TELEGRAM ----------------
+SESSION = os.getenv("SESSION", "crazyxabhi_bot")
+TOKEN = os.getenv("BOT_TOKEN")              # BotFather token
+API_ID = int(os.getenv("API_ID"))           # my.telegram.org
+API_HASH = os.getenv("API_HASH")
+WORKERS = int(os.getenv("WORKERS", "5"))
 
-START_MSG = os.environ.get(
-    "START_MESSAGE",
-    "<b>ʜᴇʟʟᴏ {first}\n\n<blockquote>ɪ ᴀᴍ ғɪʟᴇ sᴛᴏʀᴇ ʙᴏᴛ ʙʏ CrazyXAbhi.\nɪ sᴛᴏʀᴇ ғɪʟᴇs ᴀɴᴅ ɢɪᴠᴇ ʏᴏᴜ sᴇᴄᴜʀᴇ ʟɪɴᴋs.</blockquote></b>"
-)
+# ---------------- DATABASE ----------------
+DB_URI = os.getenv("DB_URI")                # MongoDB URI
+DB_NAME = os.getenv("DB_NAME", "yato")
 
-FORCE_MSG = os.environ.get(
-    "FORCE_SUB_MESSAGE",
-    "ʜᴇʟʟᴏ {first}\n\n<b>ᴊᴏɪɴ ᴏᴜʀ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴛʜᴇɴ ᴄʟɪᴄᴋ ᴏɴ ʀᴇʟᴏᴀᴅ button ᴛᴏ ɢᴇᴛ ʏᴏᴜʀ ꜰɪʟᴇ.</b>"
-)
+# ---------------- FORCE SUB ----------------
+FSUBS = [[-1003016571084, True, 10]]  # keep same structure
 
-CMD_TXT = """<blockquote><b>» ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅs:</b></blockquote>
+# Database Channel (Primary)
+DB_CHANNEL = int(os.getenv("DB_CHANNEL"))
 
-<b>›› /dlt_time :</b> sᴇᴛ ᴀᴜᴛᴏ ᴅᴇʟᴇᴛᴇ ᴛɪᴍᴇ
-<b>›› /check_dlt_time :</b> ᴄʜᴇᴄᴋ ᴄᴜʀʀᴇɴᴛ ᴅᴇʟᴇᴛᴇ ᴛɪᴍᴇ
-<b>›› /dbroadcast :</b> ʙʀᴏᴀᴅᴄᴀsᴛ ᴅᴏᴄᴜᴍᴇɴᴛ / ᴠɪᴅᴇᴏ
-<b>›› /ban :</b> ʙᴀɴ ᴀ ᴜꜱᴇʀ
-<b>›› /unban :</b> ᴜɴʙᴀɴ ᴀ ᴜꜱᴇʀ
-<b>›› /banlist :</b> ɢᴇᴛ ʟɪsᴛ ᴏꜰ ʙᴀɴɴᴇᴅ ᴜꜱᴇʀs
-<b>›› /addchnl :</b> ᴀᴅᴅ ꜰᴏʀᴄᴇ sᴜʙ ᴄʜᴀɴɴᴇʟ
-<b>›› /delchnl :</b> ʀᴇᴍᴏᴠᴇ ꜰᴏʀᴄᴇ sᴜʙ ᴄʜᴀɴɴᴇʟ
-<b>›› /listchnl :</b> ᴠɪᴇᴡ ᴀᴅᴅᴇᴅ ᴄʜᴀɴɴᴇʟs
-<b>›› /fsub_mode :</b> ᴛᴏɢɢʟᴇ ꜰᴏʀᴄᴇ sᴜʙ ᴍᴏᴅᴇ
-<b>›› /pbroadcast :</b> sᴇɴᴅ ᴘʜᴏᴛᴏ ᴛᴏ ᴀʟʟ ᴜꜱᴇʀs
-<b>›› /add_admin :</b> ᴀᴅᴅ ᴀɴ ᴀᴅᴍɪɴ
-<b>›› /deladmin :</b> ʀᴇᴍᴏᴠᴇ ᴀɴ ᴀᴅᴍɪɴ
-<b>›› /admins :</b> ɢᴇᴛ ʟɪsᴛ ᴏꜰ ᴀᴅᴍɪɴs
-"""
+# Auto Delete Timer (seconds)
+AUTO_DEL = int(os.getenv("AUTO_DEL", "300"))
 
-CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", "<b>{previouscaption}</b>")
-PROTECT_CONTENT = True if os.environ.get('PROTECT_CONTENT', "False") == "True" else False
-DISABLE_CHANNEL_BUTTON = os.environ.get("DISABLE_CHANNEL_BUTTON", None) == 'True'
+# Admin IDs (space separated in ENV)
+ADMINS = list(map(int, os.getenv("ADMINS", "6497757690").split()))
 
-BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
-USER_REPLY_TEXT = "This bot belongs to CrazyXAbhi 😎🔥"
+# Bot Settings
+DISABLE_BTN = os.getenv("DISABLE_BTN", "True") == "True"
+PROTECT = os.getenv("PROTECT", "True") == "True"
 
-# --------------------------------------------
+# ---------------- MESSAGES ----------------
+MESSAGES = {
+    "START": "<b>›› ʜᴇʏ!!, {first} ~ <blockquote>I am File Store Bot by CrazyXAbhi 😎🔥</blockquote></b>",
 
-LOG_FILE_NAME = "filesharingbot.txt"
+    "FSUB": "<b><blockquote>›› ʜᴇʏ ×</blockquote>\nʏᴏᴜʀ ғɪʟᴇ ɪs ʀᴇᴀᴅʏ ‼️\nᴘʟᴇᴀsᴇ ᴊᴏɪɴ ᴏᴜʀ ᴄʜᴀɴɴᴇʟs ᴛᴏ ɢᴇᴛ ғɪʟᴇs</b>",
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",
-    datefmt='%d-%b-%y %H:%M:%S',
-    handlers=[
-        RotatingFileHandler(LOG_FILE_NAME, maxBytes=50000000, backupCount=10),
-        logging.StreamHandler()
-    ]
-)
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
+    "ABOUT": "<b>›› Powered by CrazyXAbhi\n<blockquote expandable>"
+             "›› Channel: <a href='https://t.me/CrazyXAbhi_official'>Click Here</a>\n"
+             "›› Owner: CrazyXAbhi\n"
+             "›› Library: Pyrogram v2\n"
+             "›› Database: MongoDB\n"
+             "›› Developer: CrazyXAbhi</blockquote></b>",
 
+    "REPLY": "<b>For more updates join 👉 https://t.me/CrazyXAbhi_official</b>",
 
-def LOGGER(name: str) -> logging.Logger:
-    return logging.getLogger(name)
+    "SHORT_MSG": "<b>📊 Hey {first},\n\nYour access link is ready.\nClick OPEN LINK to continue.</b>",
+
+    "START_PHOTO": "https://graph.org/file/510affa3d4b6c911c12e3.jpg",
+    "FSUB_PHOTO": "https://telegra.ph/file/7a16ef7abae23bd238c82-b8fbdcb05422d71974.jpg",
+    "SHORT_PIC": "https://telegra.ph/file/7a16ef7abae23bd238c82-b8fbdcb05422d71974.jpg",
+    "SHORT": "https://telegra.ph/file/8aaf4df8c138c6685dcee-05d3b183d4978ec347.jpg"
+}
+
+# ---------------- LOGGER ----------------
+def LOGGER(name: str, client_name: str) -> logging.Logger:
+    logger = logging.getLogger(name)
+    formatter = logging.Formatter(
+        f"[%(asctime)s - %(levelname)s] - {client_name} - %(name)s - %(message)s",
+        datefmt='%d-%b-%y %H:%M:%S'
+    )
+    file_handler = RotatingFileHandler(LOG_FILE_NAME, maxBytes=50_000_000, backupCount=10)
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    if not logger.handlers:
+        logger.setLevel(logging.INFO)
+        logger.addHandler(file_handler)
+        logger.addHandler(stream_handler)
+
+    return logger
